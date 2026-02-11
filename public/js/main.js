@@ -86,3 +86,12 @@ export function logout() {
 document.addEventListener('demo-mode-active', () => {
   showToast('Backend offline. Demo Mode aktif (data lokal).', 'error', 5000);
 });
+
+// PWA Install Prompt
+window.deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  window.deferredPrompt = e;
+  // Dispatch event so other pages can react
+  document.dispatchEvent(new CustomEvent('pwa-installable'));
+});
