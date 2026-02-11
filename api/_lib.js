@@ -2,7 +2,10 @@ import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.PGSSLMODE === 'disable' ? false : { rejectUnauthorized: true }
+  ssl: process.env.PGSSLMODE === 'disable' ? false : { rejectUnauthorized: true },
+  max: 1, // Limit connections for Serverless environment
+  idleTimeoutMillis: 3000, // Close idle connections faster
+  connectionTimeoutMillis: 5000, // Fail fast if connection hangs
 });
 export function readBody(req) {
   return new Promise(resolve => {
