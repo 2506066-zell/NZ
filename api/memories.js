@@ -23,7 +23,7 @@ export default async function handler(req, res) {
   }
   if (req.method === 'PUT') {
     const b = req.body || await readBody(req);
-    const { id, title, media_type, media_data, note } = b;
+    const { id, title, media_type, media_data, note, version } = b;
     const idNum = Number(id);
     if (!idNum) { res.status(400).json({ error: 'Invalid id' }); return; }
     const fields = [];
@@ -33,8 +33,33 @@ export default async function handler(req, res) {
     if (media_type !== undefined) { fields.push(`media_type=$${i++}`); vals.push(media_type); }
     if (media_data !== undefined) { fields.push(`media_data=$${i++}`); vals.push(media_data); }
     if (note !== undefined) { fields.push(`note=$${i++}`); vals.push(note); }
+    
+    // Increment version
+    fields.push(`version = COALESCE(version, 0) + 1`);
+
     vals.push(idNum);
-    const r = await pool.query(`UPDATE memories SET ${fields.join(', ')} WHERE id=$${i} RETURNING *`, vals);
+    let query = `UPDATE memories SET ${fields.join(', ')} WHERE id=$${i}`;
+    
+    if (version !== undefined) {
+      i++;
+      vals.push(version);
+      query += ` AND version=$${i}`;
+    }
+    
+    query += ` RETURNING *`;
+    
+    const r = await pool.query(query, vals);
+    
+    if (r.rowCount === 0) {
+      const check = await pool.query('SELECT id FROM memories WHERE id=$1', [idNum]);
+      if (check.rowCount === 0) {
+        res.status(404).json({ error: 'Memory not found' });
+      } else {
+        res.status(409).json({ error: 'Conflict: Data has been modified by another user. Please refresh and try again.' });
+      }
+      return;
+    }
+    
     res.status(200).json(r.rows[0]);
     return;
   }

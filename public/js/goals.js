@@ -87,7 +87,22 @@ async function loadGoals() {
     slider.style.width = '100%';
     slider.style.marginTop = '8px';
     slider.onchange = async (e) => {
-      await put('/goals', { id: g.id, progress: parseInt(e.target.value) });
+      const res = await put('/goals', { 
+        id: g.id, 
+        progress: parseInt(e.target.value),
+        version: g.version
+      });
+
+      if (res.error) {
+        showToast(res.error, 'error');
+        if (res.error.includes('Conflict')) {
+            loadGoals();
+        } else {
+            e.target.value = g.progress;
+        }
+        return;
+      }
+
       loadGoals();
     };
     

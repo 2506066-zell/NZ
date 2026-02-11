@@ -36,6 +36,7 @@ async function load() {
     cb.type = 'checkbox';
     cb.checked = isCompleted;
     cb.dataset.id = String(t.id);
+    cb.dataset.version = String(t.version || 0);
     cb.dataset.action = 'toggle';
     left.appendChild(cb);
     
@@ -103,8 +104,21 @@ async function actions(e) {
     showToast('Task dihapus', 'success');
   }
   if (act === 'toggle') {
-    await put('/tasks', { id, completed: target.checked });
+    const version = target.dataset.version ? Number(target.dataset.version) : undefined;
+    const res = await put('/tasks', { id, completed: target.checked, version });
+    
+    if (res.error) {
+       showToast(res.error, 'error');
+       if (res.error.includes('Conflict')) {
+         await load(); // Reload to get latest version
+       } else {
+         target.checked = !target.checked; // Revert
+       }
+       return;
+    }
+    
     showToast(target.checked ? 'Task selesai' : 'Task dibuka', 'info');
+    if (res.version) target.dataset.version = res.version;
   }
   load();
 }

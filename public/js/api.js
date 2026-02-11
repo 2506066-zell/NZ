@@ -225,8 +225,8 @@ export async function apiFetch(path, options = {}) {
     const type = res.headers.get('content-type');
     const isHtml = type && type.includes('text/html');
     
-    // Fail if: 404, 405 (Method Not Allowed), or HTML response
-    if (!res.ok || isHtml) {
+    // Fail if: 404, 405 (Method Not Allowed), or HTML response (implies route missing/static server)
+    if ((res.status === 404 || res.status === 405) || isHtml) {
        // Specifically throw to trigger catch block for Mock
        throw new Error(`Backend unreachable: ${res.status}`);
     }

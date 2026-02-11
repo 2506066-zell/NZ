@@ -3,6 +3,7 @@ import { get, post, put, del } from './api.js';
 
 let selectedImageBase64 = null;
 let currentEditId = null;
+let currentEditVersion = null;
 
 // Image compression utility
 function compressImage(file) {
@@ -90,6 +91,7 @@ async function load() {
     editBtn.dataset.action = 'edit';
     editBtn.dataset.title = m.title || '';
     editBtn.dataset.note = m.note || '';
+    editBtn.dataset.version = String(m.version || 0);
     editBtn.innerHTML = '<i class="fa-solid fa-pen"></i>';
     
     // Delete Button
@@ -183,12 +185,13 @@ async function handleActions(e) {
     load();
     showToast('Memory deleted', 'success');
   } else if (action === 'edit') {
-    openEditModal(id, btn.dataset.title, btn.dataset.note);
+    openEditModal(id, btn.dataset.title, btn.dataset.note, btn.dataset.version);
   }
 }
 
-function openEditModal(id, title, note) {
+function openEditModal(id, title, note, version) {
   currentEditId = id;
+  currentEditVersion = version ? Number(version) : undefined;
   const modal = document.getElementById('modal-edit');
   const titleInput = modal.querySelector('input[name="title"]');
   const noteInput = modal.querySelector('textarea[name="note"]');
@@ -233,11 +236,22 @@ function initEditModal() {
       const originalText = saveBtn.innerHTML;
       saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
       
-      await put('/memories', {
+      const res = await put('/memories', {
         id: currentEditId,
         title,
-        note
+        note,
+        version: currentEditVersion
       });
+      
+      if (res.error) {
+        showToast(res.error, 'error');
+        if (res.error.includes('Conflict')) {
+          load();
+          closeModal();
+        }
+        saveBtn.innerHTML = originalText;
+        return;
+      }
       
       showToast('Memory updated!', 'success');
       load();
