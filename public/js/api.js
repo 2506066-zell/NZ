@@ -218,8 +218,19 @@ async function mockFetch(path, options) {
 
 export async function apiFetch(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...authHeader(), ...(options.headers || {}) };
+  
+  // OPTIMIZATION: Use AbortController to timeout slow requests
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 8000); // 8s timeout
+
   try {
-    const res = await fetch(`${base}${path}`, { ...options, headers });
+    const res = await fetch(`${base}${path}`, { 
+      ...options, 
+      headers,
+      signal: controller.signal 
+    });
+    clearTimeout(timeoutId);
+
     // Live Server returns 405 Method Not Allowed for POST requests to static files/paths
     // It also returns 404 HTML pages for missing routes
     const type = res.headers.get('content-type');
@@ -234,8 +245,9 @@ export async function apiFetch(path, options = {}) {
     handle401(res);
     return res;
   } catch (err) {
+    clearTimeout(timeoutId);
     // Fallback to Mock
-    console.log('Fetch failed, using mock:', err.message);
+    console.log('Fetch failed/timeout, using mock:', err.message);
     return mockFetch(path, options);
   }
 }
