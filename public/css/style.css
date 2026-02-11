@@ -20,6 +20,19 @@
   --radius-btn: 4px;
   --font-mono: 'Fira Code', monospace;
 }
+
+/* MOBILE OPTIMIZATION */
+@media (max-width: 768px) {
+  :root {
+    --glass: background: var(--surface-strong); /* No blur on mobile */
+    --glass-bg: var(--surface-strong);
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+  }
+  .card:hover { transform: none; box-shadow: none; } /* Disable hover effects */
+  .brand:hover { animation: none; } /* Disable glitch animation */
+  * { animation-duration: 0s !important; transition: none !important; } /* Kill all heavy animations */
+}
+
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {

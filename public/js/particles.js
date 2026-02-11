@@ -9,6 +9,15 @@ const mouseDistance = 150;
 let mouse = { x: null, y: null };
 
 function initParticles() {
+  // OPTIMIZATION: Disable on mobile or low power devices
+  const isMobile = window.innerWidth < 768;
+  const isLowPower = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+  
+  if (isMobile || isLowPower) {
+    console.log('Particles disabled for performance');
+    return;
+  }
+
   canvas.style.position = 'fixed';
   canvas.style.top = '0';
   canvas.style.left = '0';

@@ -4,6 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="manifest" href="manifest.json">
+  
+  <!-- PERFORMANCE OPTIMIZATION -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/themes.css">
   <link rel="icon" href="icons/192.png">
@@ -93,8 +99,12 @@
   </div>
   <script type="module">
     import { initProtected } from './js/main.js';
-    import './js/particles.js';
     initProtected();
+    
+    // OPTIMIZATION: Only load particles on desktop
+    if (window.innerWidth >= 768 && navigator.hardwareConcurrency > 4) {
+      import('./js/particles.js');
+    }
   </script>
 </body>
 </html>

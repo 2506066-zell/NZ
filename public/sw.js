@@ -14,6 +14,7 @@ const ASSETS = [
   'css/style.css',
   'css/themes.css',
   'js/main.js',
+  'js/particles.js',
   'js/api.js',
   'js/login.js',
   'js/memories.js',
