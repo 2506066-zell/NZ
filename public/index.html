@@ -103,6 +103,15 @@
     import { initProtected } from './js/main.js';
     initProtected();
     
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(reg => {
+          console.log('SW registered:', reg);
+        }).catch(err => console.log('SW registration failed:', err));
+      });
+    }
+
     // OPTIMIZATION: Only load particles on desktop
     if (window.innerWidth >= 768 && navigator.hardwareConcurrency > 4) {
       import('./js/particles.js');
