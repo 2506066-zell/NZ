@@ -1,0 +1,27 @@
+{
+  "name": "cute-futura",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "vercel dev",
+    "deploy": "vercel --prod",
+    "audit:css": "node scripts/css-audit.js",
+    "check:css": "node scripts/css-fetch-check.js http://localhost:3000",
+    "serve:ci": "http-server -p 3000 public",
+    "test": "npm run audit:css && npm run serve:ci & npm run check:css"
+  },
+  "dependencies": {
+    "pg": "^8.11.3",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3"
+  },
+  "devDependencies": {
+    "vercel": "^33.7.0",
+    "http-server": "^14.1.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
