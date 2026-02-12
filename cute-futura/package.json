@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vercel dev",
     "start": "vercel dev",
-    "build": "vercel build",
     "deploy": "vercel --prod",
     "deploy:preview": "vercel deploy --prebuilt",
     "deploy:prod": "vercel deploy --prebuilt --prod",

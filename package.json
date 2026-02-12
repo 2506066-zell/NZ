@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "vercel build",
     "deploy": "vercel --prod",
     "deploy:preview": "vercel deploy --prebuilt",
     "deploy:prod": "vercel deploy --prebuilt --prod"
