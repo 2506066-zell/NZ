@@ -1,4 +1,4 @@
-﻿<!doctype html>
+﻿﻿﻿﻿﻿﻿﻿<!doctype html>
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="utf-8">
@@ -19,6 +19,20 @@
   <title>NZ • Home</title>
 </head>
 <body>
+  <!-- GALAXY BACKGROUND -->
+  <div class="galaxy-bg">
+    <div class="nebula nebula-1"></div>
+    <div class="nebula nebula-2"></div>
+    <div class="nebula nebula-3"></div>
+    <div class="stars-sm"></div>
+    <div class="stars-md"></div>
+    
+    <!-- Dynamic Icons -->
+    <i class="bg-icon planet fa-solid fa-globe"></i>
+    <i class="bg-icon galaxy fa-solid fa-hurricane"></i>
+    <i class="bg-icon moon fa-solid fa-moon"></i>
+  </div>
+
   <nav class="navbar">
     <div class="brand"><i class="fa-solid fa-heart"></i> NZ</div>
     <div class="nav-actions">
@@ -28,32 +42,38 @@
   <div class="container">
     
     <!-- HERO TIMER START -->
-    <div class="hero-timer-card">
-      <div class="hero-title">Grow Together</div>
-      <div id="hero-timer" class="hero-timer">
-        <div class="time-unit">
-          <span class="val" id="t-days">00</span>
-          <span class="label">Hari</span>
+    <div class="card" style="text-align:center; margin-bottom: 2rem;">
+      <div class="section-title">Grow Together</div>
+      <div id="countdown" class="countdown">
+        <div class="time-box">
+          <span id="t-days">00</span>
+          <label>Hari</label>
         </div>
-        <div class="sep">:</div>
-        <div class="time-unit">
-          <span class="val" id="t-hours">00</span>
-          <span class="label">Jam</span>
+        <div class="time-box">
+          <span id="t-hours">00</span>
+          <label>Jam</label>
         </div>
-        <div class="sep">:</div>
-        <div class="time-unit">
-          <span class="val" id="t-minutes">00</span>
-          <span class="label">Menit</span>
+        <div class="time-box">
+          <span id="t-minutes">00</span>
+          <label>Menit</label>
         </div>
-        <div class="sep">:</div>
-        <div class="time-unit">
-          <span class="val" id="t-seconds">00</span>
-          <span class="label">Detik</span>
+        <div class="time-box">
+          <span id="t-seconds">00</span>
+          <label>Detik</label>
         </div>
       </div>
-      <div class="hero-date muted">23 November 2025</div>
+      <div class="muted">Since 23 November 2025</div>
     </div>
     <!-- HERO TIMER END -->
+
+    <!-- WEEKLY CONTRIBUTION STATS -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="section-title"><i class="fa-solid fa-chart-line"></i> Weekly Contribution</div>
+      <div id="weekly-stats" class="stats-container">
+        <div class="skeleton skeleton-line" style="width:100%"></div>
+        <div class="skeleton skeleton-line" style="width:80%"></div>
+      </div>
+    </div>
 
     <div class="grid home-grid">
       <div class="card">
@@ -65,6 +85,11 @@
         <div class="section-title"><i class="fa-solid fa-list-check"></i> Daily Tasks</div>
         <div class="muted">Simple checklist.</div>
         <a class="btn" href="daily-tasks.html">Open</a>
+      </div>
+      <div class="card">
+        <div class="section-title"><i class="fa-solid fa-calendar-check"></i> Monthly Habits</div>
+        <div class="muted">Track consistency & streaks.</div>
+        <a class="btn" href="monthly-todos.html">Open</a>
       </div>
       <div class="card">
         <div class="section-title"><i class="fa-solid fa-graduation-cap"></i> College Assignments</div>
@@ -101,7 +126,52 @@
   </div>
   <script type="module">
     import { initProtected } from './js/main.js';
-    initProtected();
+    import { get } from './js/api.js';
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      initProtected();
+      
+      // Load Weekly Stats
+      const statsContainer = document.getElementById('weekly-stats');
+      try {
+        const data = await get('/stats');
+        if (data && data.stats) {
+          statsContainer.innerHTML = '';
+          const max = data.combined || 1;
+          
+          data.stats.forEach(s => {
+            const user = s.user || 'Unknown';
+            const score = Number(s.total_score);
+            const percent = Math.round((score / max) * 100);
+            
+            const row = document.createElement('div');
+            row.style.marginBottom = '12px';
+            row.innerHTML = `
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:14px">
+                <span style="font-weight:600">${user}</span>
+                <span style="color:var(--primary)">${score} pts</span>
+              </div>
+              <div style="height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden">
+                <div style="height:100%;background:var(--primary);width:0%;transition:width 1s ease" class="bar-fill"></div>
+              </div>
+            `;
+            statsContainer.appendChild(row);
+            
+            // Animate bar
+            setTimeout(() => {
+                row.querySelector('.bar-fill').style.width = `${percent}%`;
+            }, 100);
+          });
+          
+          if (data.stats.length === 0) {
+             statsContainer.innerHTML = '<div class="muted center">No activity this week yet.</div>';
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        statsContainer.innerHTML = '<div class="muted center">Failed to load stats.</div>';
+      }
+    });
     
     // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {

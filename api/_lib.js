@@ -32,3 +32,15 @@ export function verifyToken(req, res) {
     return null;
   }
 }
+
+export async function logActivity(client, entityType, entityId, actionType, userId, changes = {}) {
+  try {
+    await client.query(
+      `INSERT INTO activity_logs (entity_type, entity_id, action_type, user_id, changes) 
+       VALUES ($1, $2, $3, $4, $5)`,
+      [entityType, entityId, actionType, userId, JSON.stringify(changes)]
+    );
+  } catch (err) {
+    console.error('Failed to log activity:', err);
+  }
+}

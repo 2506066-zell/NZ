@@ -35,7 +35,10 @@ const routes = [
   { path: '/api/memories', file: '../api/memories.js' },
   { path: '/api/assignments', file: '../api/assignments.js' },
   { path: '/api/anniversary', file: '../api/anniversary.js' },
-  { path: '/api/goals', file: '../api/goals.js' }
+  { path: '/api/goals', file: '../api/goals.js' },
+  { path: '/api/activity', file: '../api/activity.js' },
+  { path: '/api/monthly', file: '../api/monthly.js' },
+  { path: '/api/monthly_stats', file: '../api/monthly_stats.js' }
 ];
 
 routes.forEach(route => {

@@ -120,21 +120,40 @@ html[data-theme="light"] .badge {
   border: 1px solid rgba(66, 153, 225, 0.2);
 }
 html[data-theme="dark"] {
-  /* ADDED: Dark pastel variants */
-  --bg: #13162a;
-  --surface: rgba(255,255,255,0.10);
-  --surface-strong: rgba(255,255,255,0.18);
-  --text: #e6e6f1;
-  --muted: #b0b7d9;
-  --primary: #bcbcf0;
-  --secondary: #bfe9cf;
-  --accent: #ffb8c6;
-  --success: #7cd790;
-  --danger: #ff7d9a;
-  --shadow: 0 12px 40px rgba(0,0,0,0.28);
-  --glass-bg: rgba(255,255,255,0.14);
-  --glass-border: 1px solid rgba(255,255,255,0.20);
-  --glass-shadow: 0 8px 32px rgba(0,0,0,0.20);
+  /* GALAXY THEME (Default Dark) */
+  --bg-deep: #050816;
+  --bg-gradient: radial-gradient(circle at 20% 30%, #0B0F2A 0%, #050816 60%, #02040a 100%);
+  
+  --surface: rgba(255, 255, 255, 0.03);
+  --surface-hover: rgba(255, 255, 255, 0.06);
+  --surface-strong: rgba(13, 17, 40, 0.85);
+  
+  --text: #ffffff;
+  --text-soft: #DDE6FF;
+  --muted: #8892b0;
+  
+  --primary: #4DA3FF;
+  --primary-glow: rgba(77, 163, 255, 0.4);
+  --secondary: #8A5CFF;
+  --accent: #E6F1FF;
+  --success: #00E5FF;
+  --danger: #FF3366;
+  
+  --shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  --glass: backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+  --glass-glow: 0 0 20px rgba(77, 163, 255, 0.05);
+}
+/* Ensure body background uses the new variables */
+html[data-theme="dark"] body {
+  background: var(--bg-deep);
+  background-image: 
+    radial-gradient(circle at 15% 50%, rgba(77, 163, 255, 0.08) 0%, transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(138, 92, 255, 0.08) 0%, transparent 25%),
+    var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text-soft);
 }
 /* ADDED: Smooth transition for commonly themed elements */
 body, .card, .navbar, .modal-content, .list-item, .chat-messages {
