@@ -8,6 +8,13 @@ export const pool = new Pool({
   idleTimeoutMillis: 3000, // Close idle connections faster
   connectionTimeoutMillis: 5000, // Fail fast if connection hangs
 });
+
+// Prevent crash on unexpected connection loss
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle client', err);
+  // Don't exit process, just log. Vercel/Neon will recover on next request.
+});
+
 export function readBody(req) {
   return new Promise(resolve => {
     let data = '';
