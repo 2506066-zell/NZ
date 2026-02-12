@@ -1,12 +1,6 @@
 {
   "version": 2,
   "regions": ["sin1"],
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs",
-      "maxDuration": 10
-    }
-  },
   "rewrites": [
     { "source": "/", "destination": "/cute-futura/public/index.html" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
