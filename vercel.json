@@ -7,10 +7,10 @@
       "maxDuration": 10
     }
   },
-  "routes": [
-    { "src": "^/$", "dest": "/cute-futura/public/index.html" },
-    { "src": "^/api/(.*)$", "dest": "/api/$1" },
-    { "src": "^(?!/api)(.*)$", "dest": "/cute-futura/public/$1" }
+  "rewrites": [
+    { "source": "/", "destination": "/cute-futura/public/index.html" },
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*)", "destination": "/cute-futura/public/$1" }
   ],
   "cleanUrls": true,
   "headers": [
