@@ -1,6 +1,10 @@
 {
   "version": 2,
   "regions": ["sin1"],
+  "builds": [
+    { "src": "api/router.js", "use": "@vercel/node" },
+    { "src": "cute-futura/public/**", "use": "@vercel/static" }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/cute-futura/public/index.html" },
     { "source": "/api/(.*)", "destination": "/api/router.js?path=$1" },
