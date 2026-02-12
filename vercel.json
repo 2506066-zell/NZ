@@ -3,7 +3,7 @@
   "regions": ["sin1"],
   "rewrites": [
     { "source": "/", "destination": "/cute-futura/public/index.html" },
-    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/api/(.*)", "destination": "/api/router.js?path=$1" },
     { "source": "/(.*)", "destination": "/cute-futura/public/$1" }
   ],
   "cleanUrls": true,
