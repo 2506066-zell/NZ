@@ -1,10 +1,10 @@
-import { pool, readBody, verifyToken } from './_lib.js';
-export default async function handler(req, res) {
+import { pool, readBody, verifyToken, withErrorHandling, sendJson } from './_lib.js';
+export default withErrorHandling(async function handler(req, res) {
   const v = verifyToken(req, res);
   if (!v) return;
   if (req.method === 'GET') {
     const r = await pool.query('SELECT * FROM assignments ORDER BY deadline NULLS LAST, id DESC');
-    res.status(200).json(r.rows);
+    sendJson(res, 200, r.rows, 30);
     return;
   }
   if (req.method === 'POST') {
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
       return;
     }
     const r = await pool.query('INSERT INTO assignments (title, deadline) VALUES ($1,$2) RETURNING *', [title, dl || null]);
-    res.status(200).json(r.rows[0]);
+    sendJson(res, 200, r.rows[0]);
     return;
   }
   if (req.method === 'PUT') {
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
     if (completed !== undefined) { fields.push(`completed=$${i++}`); vals.push(completed); }
     vals.push(idNum);
     const r = await pool.query(`UPDATE assignments SET ${fields.join(', ')} WHERE id=$${i} RETURNING *`, vals);
-    res.status(200).json(r.rows[0]);
+    sendJson(res, 200, r.rows[0]);
     return;
   }
   if (req.method === 'DELETE') {
@@ -48,8 +48,8 @@ export default async function handler(req, res) {
     const idNum = Number(id);
     if (!idNum) { res.status(400).json({ error: 'Invalid id' }); return; }
     await pool.query('DELETE FROM assignments WHERE id=$1', [idNum]);
-    res.status(200).json({ ok: true });
+    sendJson(res, 200, { ok: true });
     return;
   }
   res.status(405).json({ error: 'Method not allowed' });
-}
+})

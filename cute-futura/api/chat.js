@@ -1,6 +1,6 @@
-import { pool, readBody, verifyToken, logActivity } from './_lib.js';
+import { pool, readBody, verifyToken, logActivity, withErrorHandling, sendJson } from './_lib.js';
 
-export default async function handler(req, res) {
+export default withErrorHandling(async function handler(req, res) {
     const v = verifyToken(req, res);
     if (!v) return;
     const user = v.user;
@@ -9,7 +9,7 @@ export default async function handler(req, res) {
         // Fetch last 50 messages
         const r = await pool.query('SELECT * FROM chat_messages ORDER BY created_at DESC LIMIT 50');
         // Reverse to show oldest first in UI
-        res.status(200).json(r.rows.reverse());
+        sendJson(res, 200, r.rows.reverse(), 15);
         return;
     }
 
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
             [user, message]
         );
 
-        res.status(200).json(r.rows[0]);
+        sendJson(res, 200, r.rows[0]);
         return;
     }
 
@@ -38,9 +38,9 @@ export default async function handler(req, res) {
             return;
         }
         await pool.query('DELETE FROM chat_messages');
-        res.status(200).json({ ok: true });
+        sendJson(res, 200, { ok: true });
         return;
     }
 
     res.status(405).json({ error: 'Method not allowed' });
-}
+})

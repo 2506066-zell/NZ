@@ -51,3 +51,25 @@ export async function logActivity(client, entityType, entityId, actionType, user
     console.error('Failed to log activity:', err);
   }
 }
+
+export function sendJson(res, status, data, cacheSeconds = 0) {
+  if (cacheSeconds > 0) {
+    res.setHeader('Cache-Control', `private, max-age=${cacheSeconds}`);
+  } else {
+    res.setHeader('Cache-Control', 'no-store');
+  }
+  res.status(status).json(data);
+}
+
+export function withErrorHandling(fn) {
+  return async (req, res) => {
+    try {
+      await fn(req, res);
+    } catch (err) {
+      console.error(err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    }
+  };
+}

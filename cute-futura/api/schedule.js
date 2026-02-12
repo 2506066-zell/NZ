@@ -1,13 +1,13 @@
-import { pool, readBody, verifyToken, logActivity } from './_lib.js';
+import { pool, readBody, verifyToken, logActivity, withErrorHandling, sendJson } from './_lib.js';
 
-export default async function handler(req, res) {
+export default withErrorHandling(async function handler(req, res) {
     const v = verifyToken(req, res);
     if (!v) return;
     const user = v.user;
 
     if (req.method === 'GET') {
         const r = await pool.query('SELECT * FROM schedule ORDER BY day_id, time_start');
-        res.status(200).json(r.rows);
+        sendJson(res, 200, r.rows, 120);
         return;
     }
 
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
         );
 
         await logActivity(pool, 'schedule', r.rows[0].id, 'CREATE', user, { subject, day });
-        res.status(200).json(r.rows[0]);
+        sendJson(res, 200, r.rows[0]);
         return;
     }
 
@@ -40,9 +40,9 @@ export default async function handler(req, res) {
             await logActivity(pool, 'schedule', id, 'DELETE', user, r.rows[0]);
         }
 
-        res.status(200).json({ ok: true });
+        sendJson(res, 200, { ok: true });
         return;
     }
 
     res.status(405).json({ error: 'Method not allowed' });
-}
+})

@@ -1,6 +1,6 @@
-import { pool, readBody, verifyToken } from './_lib.js';
+import { pool, readBody, verifyToken, withErrorHandling, sendJson } from './_lib.js';
 
-export default async function handler(req, res) {
+export default withErrorHandling(async function handler(req, res) {
   const v = verifyToken(req, res);
   if (!v) return;
   // const user = v.user; // We might use this for permission check, but prompt says "support 2 fixed users". 
@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     const todos = todosRes.rows;
 
     if (todos.length === 0) {
-      res.status(200).json([]);
+      sendJson(res, 200, [], 30);
       return;
     }
 
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
       return { ...t, completed_days: completedDays };
     });
 
-    res.status(200).json(result);
+    sendJson(res, 200, result, 30);
     return;
   }
 
@@ -67,7 +67,7 @@ export default async function handler(req, res) {
         'INSERT INTO monthly_todos (user_id, month, title) VALUES ($1, $2, $3) RETURNING *',
         [user_id, month, title]
       );
-      res.status(200).json(r.rows[0]);
+      sendJson(res, 200, r.rows[0]);
       return;
     }
 
@@ -99,7 +99,7 @@ export default async function handler(req, res) {
          RETURNING *`,
         [todo_id, date, completed]
       );
-      res.status(200).json(r.rows[0]);
+      sendJson(res, 200, r.rows[0]);
       return;
     }
   }
@@ -120,9 +120,9 @@ export default async function handler(req, res) {
     }
 
     await pool.query('DELETE FROM monthly_todos WHERE id = $1', [id]);
-    res.status(200).json({ success: true });
+    sendJson(res, 200, { success: true });
     return;
   }
 
   res.status(405).json({ error: 'Method not allowed' });
-}
+})

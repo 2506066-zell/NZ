@@ -1,6 +1,6 @@
-import { pool, verifyToken } from './_lib.js';
+import { pool, verifyToken, withErrorHandling, sendJson } from './_lib.js';
 
-export default async function handler(req, res) {
+export default withErrorHandling(async function handler(req, res) {
   if (req.method !== 'GET') { res.status(405).json({ error: 'Method not allowed' }); return; }
   const v = verifyToken(req, res);
   if (!v) return;
@@ -114,5 +114,5 @@ export default async function handler(req, res) {
     (Object.values(stats).reduce((acc, s) => acc + s.completion_rate, 0)) / users.length
   );
 
-  res.status(200).json({ users: stats, combined: combinedRate });
-}
+  sendJson(res, 200, { users: stats, combined: combinedRate }, 60);
+})

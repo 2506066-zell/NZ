@@ -1,15 +1,15 @@
-import { pool, readBody, verifyToken } from './_lib.js';
-export default async function handler(req, res) {
+import { pool, readBody, verifyToken, withErrorHandling, sendJson } from './_lib.js';
+export default withErrorHandling(async function handler(req, res) {
   const v = verifyToken(req, res);
   if (!v) return;
   if (req.method === 'GET') {
     const r = await pool.query('SELECT * FROM anniversary WHERE id=1');
     if (r.rows.length === 0) {
       const created = await pool.query('INSERT INTO anniversary (id) VALUES (1) RETURNING *');
-      res.status(200).json(created.rows[0]);
+      sendJson(res, 200, created.rows[0], 300);
       return;
     }
-    res.status(200).json(r.rows[0]);
+    sendJson(res, 200, r.rows[0], 300);
     return;
   }
   if (req.method === 'PUT') {
@@ -22,8 +22,8 @@ export default async function handler(req, res) {
       dval = dt;
     }
     const r = await pool.query('UPDATE anniversary SET date=$1, note=$2 WHERE id=1 RETURNING *', [dval, note || null]);
-    res.status(200).json(r.rows[0]);
+    sendJson(res, 200, r.rows[0]);
     return;
   }
   res.status(405).json({ error: 'Method not allowed' });
-}
+})

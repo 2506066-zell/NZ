@@ -1,6 +1,6 @@
-import { pool, verifyToken } from './_lib.js';
+import { pool, verifyToken, withErrorHandling, sendJson } from './_lib.js';
 
-export default async function handler(req, res) {
+export default withErrorHandling(async function handler(req, res) {
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
@@ -23,9 +23,9 @@ export default async function handler(req, res) {
       'SELECT * FROM activity_logs WHERE entity_type=$1 AND entity_id=$2 ORDER BY created_at DESC',
       [entity_type, entity_id]
     );
-    res.status(200).json(r.rows);
+    sendJson(res, 200, r.rows, 30);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Database error' });
   }
-}
+})

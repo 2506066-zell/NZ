@@ -1,10 +1,10 @@
-import { pool, readBody, verifyToken } from './_lib.js';
-export default async function handler(req, res) {
+import { pool, readBody, verifyToken, withErrorHandling, sendJson } from './_lib.js';
+export default withErrorHandling(async function handler(req, res) {
   const v = verifyToken(req, res);
   if (!v) return;
   if (req.method === 'GET') {
     const r = await pool.query('SELECT * FROM memories ORDER BY created_at DESC');
-    res.status(200).json(r.rows);
+    sendJson(res, 200, r.rows, 30);
     return;
   }
   if (req.method === 'POST') {
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
       'INSERT INTO memories (title, media_type, media_data, note) VALUES ($1,$2,$3,$4) RETURNING *',
       [title, media_type, media_data, note]
     );
-    res.status(200).json(r.rows[0]);
+    sendJson(res, 200, r.rows[0]);
     return;
   }
   if (req.method === 'PUT') {
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
       return;
     }
     
-    res.status(200).json(r.rows[0]);
+    sendJson(res, 200, r.rows[0]);
     return;
   }
   if (req.method === 'DELETE') {
@@ -68,8 +68,8 @@ export default async function handler(req, res) {
     const idNum = Number(id);
     if (!idNum) { res.status(400).json({ error: 'Invalid id' }); return; }
     await pool.query('DELETE FROM memories WHERE id=$1', [idNum]);
-    res.status(200).json({ ok: true });
+    sendJson(res, 200, { ok: true });
     return;
   }
   res.status(405).json({ error: 'Method not allowed' });
-}
+})

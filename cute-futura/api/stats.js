@@ -1,6 +1,6 @@
-import { pool, verifyToken } from './_lib.js';
+import { pool, verifyToken, withErrorHandling, sendJson } from './_lib.js';
 
-export default async function handler(req, res) {
+export default withErrorHandling(async function handler(req, res) {
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Method not allowed' });
     return;
@@ -56,14 +56,14 @@ export default async function handler(req, res) {
     const stats = r.rows;
     const combined = stats.reduce((acc, curr) => acc + Number(curr.total_score), 0);
     
-    res.status(200).json({
+    sendJson(res, 200, {
       stats,
       combined,
-      week_start: new Date().toISOString() // Just a placeholder, ideally calculated
-    });
+      week_start: new Date().toISOString()
+    }, 30);
     
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Database error' });
   }
-}
+})
