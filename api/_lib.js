@@ -1,12 +1,16 @@
 import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
+const connStr =
+  process.env.POSTGRES_URL ||
+  process.env.DATABASE_URL ||
+  process.env.NZ_DATABASE_URL ||
+  process.env.NZ_DATABSE_URL;
 export const pool = new Pool({
-  // Use POSTGRES_URL first (Vercel default), fallback to DATABASE_URL
-  connectionString: process.env.POSTGRES_URL || process.env.DATABASE_URL,
+  connectionString: connStr,
   ssl: process.env.PGSSLMODE === 'disable' ? false : { rejectUnauthorized: true },
-  max: 1, // Limit connections for Serverless environment
-  idleTimeoutMillis: 3000, // Close idle connections faster
-  connectionTimeoutMillis: 5000, // Fail fast if connection hangs
+  max: 1,
+  idleTimeoutMillis: 3000,
+  connectionTimeoutMillis: 5000,
 });
 
 // Prevent crash on unexpected connection loss

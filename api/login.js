@@ -15,7 +15,10 @@ export default async function handler(req, res) {
     return;
   }
   const hash = process.env.APP_PASSWORD_HASH || '';
-  const ok = hash && await bcrypt.compare(password || '', hash);
+  const plain = process.env.APP_PASSWORD || '';
+  let ok = false;
+  if (hash) ok = await bcrypt.compare(password || '', hash);
+  else if (plain) ok = (password || '') === plain;
   if (!ok) {
     res.status(401).json({ error: 'Unauthorized' });
     return;
